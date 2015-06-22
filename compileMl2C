@@ -1,0 +1,27 @@
+if [ $# -ne 1 ]
+then 
+	echo "Usage : compileMl2C [ml file]"
+	exit 1
+fi
+
+FILE_BASE_NAME=""
+
+getFileBaseName()
+{
+	FILE_BASE_NAME="$1"
+	if [ $# -eq 1 ]
+	then
+		FILE_BASE_NAME=${FILE_BASE_NAME##*/}
+		FILE_BASE_NAME=${FILE_BASE_NAME%.*}
+	fi
+}
+
+getFileBaseName "$1"
+
+echo "Compiling the compiler ..."
+make
+echo "generating C code for $1 ..."
+./ml2C $1
+echo "Compiling $FILE_BASE_NAME.c ..." 
+gcc -o $FILE_BASE_NAME.o -c $FILE_BASE_NAME.c -Wall
+gcc -o $FILE_BASE_NAME $FILE_BASE_NAME.o runtime.so
